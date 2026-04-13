@@ -2414,7 +2414,46 @@
         </div>
     </footer>
 
+    <!-- EmailJS SDK – sends order notifications directly from the browser (no backend needed) -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
     <script>
+        // =====================================================================
+        // EMAIL NOTIFICATION SETUP  (EmailJS – free, no backend required)
+        // =====================================================================
+        // HOW TO ACTIVATE IN 5 MINUTES:
+        //
+        // 1. Go to https://www.emailjs.com/ and create a FREE account.
+        //
+        // 2. Click "Email Services" → "Add New Service"
+        //    Connect your Gmail account (hometownbakerytz@gmail.com).
+        //    Copy the Service ID (e.g. "service_xxxxxx").
+        //
+        // 3. Click "Email Templates" → "Create New Template"
+        //    Set the template up like this:
+        //
+        //      To:       {{to_email}}
+        //      Subject:  {{subject}}
+        //      Content:  {{message}}
+        //
+        //    Save the template. Copy the Template ID (e.g. "template_xxxxxx").
+        //
+        // 4. Click "Account" → copy your Public Key (e.g. "abc123XYZ").
+        //
+        // 5. Replace the three placeholder values below and you are done!
+        //    Both email addresses will receive every new order automatically.
+        // =====================================================================
+
+        const EMAILJS_PUBLIC_KEY  = "YOUR_PUBLIC_KEY";   // from Account → API Keys
+        const EMAILJS_SERVICE_ID  = "YOUR_SERVICE_ID";   // from Email Services
+        const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";  // from Email Templates
+
+        // Both owners receive every order notification
+        const NOTIFICATION_EMAILS = "info@hometownbakery.co.tz, hometownbakerytz@gmail.com";
+
+        // Initialize EmailJS
+        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
         // --- Global Cart ---
         let cart = {};
         
@@ -2650,55 +2689,85 @@
             document.getElementById('cart-modal').classList.remove('active');
         }
 
-        
+
+        // --- Helper: format a date/time string in Tanzania timezone ---
+        function tanzaniaDateTime() {
+            return new Date().toLocaleString('en-TZ', {
+                timeZone: 'Africa/Dar_es_Salaam',
+                dateStyle: 'full',
+                timeStyle: 'short'
+            });
+        }
+
+        // --- Helper: send order notification email via EmailJS ---
+        async function sendOrderNotification(subject, message) {
+            return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                to_email: NOTIFICATION_EMAILS,
+                subject:  subject,
+                message:  message,
+                from_name: "Hometown Bakery Website"
+            });
+        }
+
         // --- NEW SUBMIT FUNCTIONS ---
 
         // 1. For the GLOBAL CART (modal checkout)
         async function submitCartOrder() {
             const form = document.getElementById('checkout-form');
-            
+
             // --- Form Validation ---
             if (!form.checkValidity()) {
                 form.reportValidity();
                 return;
             }
-            
+
             const formData = new FormData(form);
             const customerData = Object.fromEntries(formData);
-            
+
             if (Object.keys(cart).length === 0) {
                 alert("Your cart is empty. Please add some items first.");
                 return;
             }
-            
-            // Combine cart data and customer data
-            const orderData = {
-                ...customerData,
-                items: cart,
-                order_type: "Cart" // This tells the backend how to format the email
-            };
+
+            // Build a readable list of cart items with subtotals
+            let itemsText = '';
+            let total = 0;
+            for (const [id, item] of Object.entries(cart)) {
+                const subtotal = item.price * item.qty;
+                total += subtotal;
+                itemsText += `  - ${item.name} x${item.qty} = TSh ${subtotal.toLocaleString()}\n`;
+            }
+
+            const subject = `NEW CART ORDER from ${customerData.name} – Hometown Bakery`;
+            const message =
+`NEW CART ORDER – Hometown Bakery
+=================================
+
+CUSTOMER DETAILS:
+  Name:    ${customerData.name}
+  Phone:   ${customerData.phone}
+  Service: ${customerData.service_type}
+
+ORDER ITEMS:
+${itemsText}
+  ─────────────────────────────────
+  TOTAL: TSh ${total.toLocaleString()}
+
+Order received: ${tanzaniaDateTime()}
+
+Please call the customer to confirm their order.`;
 
             alert("Sending your order, please wait...");
 
             try {
-                // Send the combined data to your backend server
-                const response = await fetch('http://hometownbakery.co.tz', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(orderData),
-                });
-
-                if (response.ok) {
-                    alert(`Thank you, ${customerData.name}! 🎉\n\nYour order has been sent. We will call you at ${customerData.phone} shortly to confirm.`);
-                    cart = {}; // Empty the cart
-                    updateCartCount();
-                    closeCartModal();
-                } else {
-                    alert("There was a problem sending your order. Please try calling us.");
-                }
+                await sendOrderNotification(subject, message);
+                alert(`Thank you, ${customerData.name}! 🎉\n\nYour order has been sent. We will call you at ${customerData.phone} shortly to confirm.`);
+                cart = {};
+                updateCartCount();
+                closeCartModal();
             } catch (error) {
-                console.error('Fetch error:', error);
-                alert("Could not connect to the server. Please check your internet and try again.");
+                console.error('EmailJS error:', error);
+                alert("There was a problem sending your order. Please try calling us at +255713333583.");
             }
         }
         
@@ -2706,22 +2775,33 @@
         async function submitQuickOrderForm(event) {
             event.preventDefault();
             const form = event.target;
-            
+
             if (!form.checkValidity()) {
                 form.reportValidity();
                 return;
             }
-            
+
             const formData = new FormData(form);
             const data = Object.fromEntries(formData);
 
-            // Check if any item was selected
+            // Human-readable names for the quantity input IDs
+            const itemNameMap = {
+                'qty_white_bread':  'White Bread',
+                'qty_potato_bread': 'Potato Bread',
+                'qty_maandazi':     'Maandazi',
+                'qty_milk_bread':   'Milk Bread',
+                'qty_scons':        'Scons (Vitenesi)',
+                'qty_cupcake':      'Cup Cake'
+            };
+
+            // Build readable item list and validate at least one item selected
             let hasItems = false;
-            let itemDetails = {};
+            let itemsText = '';
             for (const [key, qty] of Object.entries(data)) {
                 if (key.startsWith('qty_') && parseInt(qty) > 0) {
                     hasItems = true;
-                    itemDetails[key] = qty; // Store the items
+                    const name = itemNameMap[key] || key.replace('qty_', '').replace(/_/g, ' ');
+                    itemsText += `  - ${name}: ${qty}\n`;
                 }
             }
 
@@ -2729,72 +2809,78 @@
                 alert("Please select at least one item (quantity > 0) to order.");
                 return;
             }
-            
-            // Build the final order data
-            const orderData = {
-                name: data.name,
-                phone: data.phone,
-                service_type: data.service_type,
-                items: itemDetails, // Send only the items
-                order_type: "QuickForm" // This tells the backend how to format
-            };
+
+            const subject = `NEW QUICK ORDER from ${data.name} – Hometown Bakery`;
+            const message =
+`NEW QUICK ORDER – Hometown Bakery
+===================================
+
+CUSTOMER DETAILS:
+  Name:    ${data.name}
+  Phone:   ${data.phone}
+  Service: ${data.service_type}
+
+ORDER ITEMS:
+${itemsText}
+Order received: ${tanzaniaDateTime()}
+
+Please call the customer to confirm their order.`;
 
             alert("Sending your order, please wait...");
 
             try {
-                // Send the data to your new backend server
-                const response = await fetch('http://hometownbakery.co.tz', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(orderData),
-                });
-
-                if (response.ok) {
-                    alert(`Thank you, ${data.name}! 🎉\n\nYour order has been sent. We will call you at ${data.phone} shortly to confirm.`);
-                    form.reset();
-                } else {
-                    alert("There was a problem sending your order. Please try calling us.");
-                }
+                await sendOrderNotification(subject, message);
+                alert(`Thank you, ${data.name}! 🎉\n\nYour order has been sent. We will call you at ${data.phone} shortly to confirm.`);
+                form.reset();
             } catch (error) {
-                console.error('Fetch error:', error);
-                alert("Could not connect to the server. Please check your internet and try again.");
+                console.error('EmailJS error:', error);
+                alert("There was a problem sending your order. Please try calling us at +255713333583.");
             }
         }
 
         // 3. For the CUSTOM ORDER FORM
         async function submitCustomOrder(event) {
-            event.preventDefault(); 
+            event.preventDefault();
             const form = event.target;
-            
+
             if (!form.checkValidity()) {
                 form.reportValidity();
                 return;
             }
-            
+
             const formData = new FormData(form);
             const data = Object.fromEntries(formData);
 
-            alert("Sending your custom order request, please wait...");
-            
-            try {
-                // !! REMEMBER TO CHANGE THIS URL WHEN YOU HOST YOUR BACKEND !!
-                const response = await fetch('http://hometownbakery.co.tz', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data),
-                });
+            const subject = `NEW CUSTOM ORDER from ${data.name} – Hometown Bakery`;
+            const message =
+`NEW CUSTOM ORDER REQUEST – Hometown Bakery
+==========================================
 
-                if (response.ok) {
-                    alert(`Thank you, ${data.name}! 🎉\n\nYour custom order request is sent. We will contact you shortly to confirm.`);
-                    form.reset();
-                } else {
-                    alert("There was a problem sending your request. Please try calling us.");
-                }
+CUSTOMER DETAILS:
+  Name:    ${data.name}
+  Phone:   ${data.phone}
+  Email:   ${data.email || 'Not provided'}
+
+ORDER DETAILS:
+  Product Type:  ${data.product}
+  Pickup Date:   ${data.date}
+  Special Instructions:
+    ${data.instructions || 'None'}
+
+Order received: ${tanzaniaDateTime()}
+
+Please contact the customer to confirm their custom order.
+REMINDER: Custom orders require at least 2 days notice.`;
+
+            alert("Sending your custom order request, please wait...");
+
+            try {
+                await sendOrderNotification(subject, message);
+                alert(`Thank you, ${data.name}! 🎉\n\nYour custom order request is sent. We will contact you shortly to confirm.`);
+                form.reset();
             } catch (error) {
-                console.error('Fetch error:', error);
-                alert("Could not connect to the server. Please check your internet and try again.");
+                console.error('EmailJS error:', error);
+                alert("There was a problem sending your request. Please try calling us at +255713333583.");
             }
         }
 
