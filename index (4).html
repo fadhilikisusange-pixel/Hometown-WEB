@@ -1,0 +1,2803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hometown Bakery - Fresh Daily</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            background: #fff;
+        }
+
+        /* Navigation */
+        nav {
+            background: #fff;
+            padding: 1.5rem 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+        nav.scrolled {
+            padding: 1rem 8%;
+            background: rgba(255, 255, 255, 0.98);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #DA291C;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Styles for your logo image */
+        .logo-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+
+        /* Size override for the mobile menu */
+        .mobile-nav-header .logo-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+            font-size: 1rem;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: #FFC72C;
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #DA291C;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .cart-icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.8rem;
+            color: #DA291C;
+            position: relative;
+        }
+
+        #cart-item-count {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background: #FFC72C;
+            color: #DA291C;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
+
+        .order-btn {
+            background: linear-gradient(135deg, #DA291C, #ff4444);
+            color: white;
+            padding: 0.9rem 2.5rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(218, 41, 28, 0.3);
+        }
+
+        .order-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(218, 41, 28, 0.4);
+        }
+        
+        .hamburger-menu {
+            font-size: 2rem;
+            color: #DA291C;
+            cursor: pointer;
+            display: none; /* Hidden on desktop */
+        }
+        
+        /* --- Beautiful Mobile Nav Menu --- */
+        .mobile-nav-menu {
+            position: fixed;
+            top: 0;
+            right: -100%; /* Start off-screen */
+            width: 85%;
+            max-width: 320px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -5px 0 30px rgba(0,0,0,0.15);
+            z-index: 3000;
+            transition: right 0.4s ease-in-out;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .mobile-nav-menu.active {
+            right: 0;
+        }
+        
+        .mobile-nav-header {
+            background: #DA291C;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .mobile-nav-header .logo {
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .mobile-nav-header .logo .logo-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+        }
+        
+        .mobile-nav-close {
+            font-size: 2.5rem;
+            color: rgba(255,255,255,0.8);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .mobile-nav-close:hover {
+            color: white;
+            transform: rotate(90deg);
+        }
+        
+        .mobile-nav-menu ul {
+            list-style: none;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .mobile-nav-menu ul li {
+            opacity: 0;
+            transform: translateX(30px);
+            transition: all 0.4s ease-out;
+        }
+        
+        /* Animation for links */
+        .mobile-nav-menu.active ul li {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .mobile-nav-menu.active ul li:nth-child(1) { transition-delay: 0.1s; }
+        .mobile-nav-menu.active ul li:nth-child(2) { transition-delay: 0.15s; }
+        .mobile-nav-menu.active ul li:nth-child(3) { transition-delay: 0.2s; }
+        .mobile-nav-menu.active ul li:nth-child(4) { transition-delay: 0.25s; }
+        .mobile-nav-menu.active ul li:nth-child(5) { transition-delay: 0.3s; }
+        .mobile-nav-menu.active ul li:nth-child(6) { transition-delay: 0.35s; }
+        .mobile-nav-menu.active ul li:nth-child(7) { transition-delay: 0.4s; }
+        
+        
+        .mobile-nav-menu ul a {
+            text-decoration: none;
+            color: #333;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: block;
+            padding: 1rem;
+            border-radius: 10px;
+        }
+        
+        .mobile-nav-menu ul a:hover {
+            color: #DA291C;
+            background: #f9f9f9;
+        }
+        
+        .mobile-nav-menu ul a.mobile-cart-btn {
+            background: #FFC72C;
+            color: #DA291C;
+            text-align: center;
+        }
+        
+        .nav-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 2999;
+            backdrop-filter: blur(2px);
+        }
+        
+        .nav-overlay.active {
+            display: block;
+        }
+        /* --- End Mobile Nav --- */
+
+
+        /* Hero Section */
+        .hero {
+            margin-top: 90px;
+            background: linear-gradient(135deg, #FFC72C 0%, #FFD700 50%, #FFC72C 100%);
+            padding: 6rem 8%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            gap: 4rem;
+            min-height: 85vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(218, 41, 28, 0.15), transparent);
+            border-radius: 50%;
+            top: -200px;
+            right: -200px;
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .hero-content {
+            z-index: 2;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: #DA291C;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            color: #DA291C;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            font-weight: 800;
+            animation: slideUp 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: #555;
+            margin-bottom: 2.5rem;
+            line-height: 1.8;
+            animation: slideUp 0.8s ease-out 0.4s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            animation: slideUp 0.8s ease-out 0.6s both;
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, #DA291C, #ff4444);
+            color: white;
+            padding: 1.2rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+            box-shadow: 0 6px 20px rgba(218, 41, 28, 0.3);
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(218, 41, 28, 0.4);
+        }
+
+        .secondary-btn {
+            background: white;
+            color: #DA291C;
+            padding: 1.2rem 3rem;
+            border: 3px solid #DA291C;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+        }
+
+        .secondary-btn:hover {
+            background: #DA291C;
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        /* === HERO SLIDER (IMPROVEMENT) === */
+        .hero-image-slider {
+            position: relative;
+            z-index: 2;
+            animation: fadeIn 1s ease-out 0.4s both;
+            width: 100%;
+            height: 500px; /* Set fixed height for slider */
+            border-radius: 30px;
+            overflow: hidden; /* Clips images to rounded corners */
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            
+            /* Transition for fading effect */
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            z-index: 1;
+        }
+
+        .hero-slide.active {
+            opacity: 1;
+            z-index: 2; /* Brings active slide to the front */
+        }
+        /* === END HERO SLIDER === */
+
+
+        /* Quick Actions Bar */
+        .quick-actions {
+            background: #DA291C;
+            padding: 2rem 8%;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: white;
+            color: #DA291C;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .action-icon {
+            font-size: 1.5rem;
+        }
+
+        /* --- Special of the Day Section --- */
+        .special-offer {
+            padding: 4rem 8%;
+            background: #fffbef; /* Light creamy background */
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .special-offer-container {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            align-items: center;
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 25px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.08);
+        }
+
+        .special-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 20px;
+            object-fit: cover;
+            box-shadow: 0 10px 30px rgba(218, 41, 28, 0.2);
+        }
+
+        .special-content {
+            animation: slideUp 0.8s ease-out 0.2s both;
+        }
+
+        .special-content .section-badge {
+            background: #DA291C; /* Red badge for contrast on white */
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .special-content h2 {
+            font-size: 3rem;
+            color: #DA291C;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .special-description {
+            font-size: 1.15rem;
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .special-price {
+            margin-bottom: 2rem;
+        }
+
+        .new-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #DA291C;
+            margin-right: 1rem;
+        }
+
+        .old-price {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        /* --- Responsive for Special Offer --- */
+        @media (max-width: 1024px) {
+            .special-offer-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 2.5rem;
+                text-align: center;
+            }
+            .special-content h2 {
+                font-size: 2.5rem;
+            }
+            .special-price {
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .special-offer {
+                padding: 3rem 5%;
+            }
+            .special-offer-container {
+                padding: 2rem;
+            }
+            .special-content h2 {
+                font-size: 2rem;
+            }
+            .new-price {
+                font-size: 2rem;
+            }
+            .old-price {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Stats Section */
+        .stats {
+            background: #f9f9f9;
+            padding: 4rem 8%;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 3rem;
+            text-align: center;
+        }
+
+        .stat-item {
+            color: #333;
+        }
+
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #DA291C;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        /* Products Section (Popular Items) */
+        .products {
+            padding: 6rem 8%;
+            background: #fff;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-badge {
+            display: inline-block;
+            background: #FFC72C;
+            color: #DA291C;
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .section-header h2 {
+            font-size: 3.5rem;
+            color: #DA291C;
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+
+        .section-header p {
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            transition: all 0.4s;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 20px 60px rgba(218, 41, 28, 0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            display: block;
+        }
+        
+        .product-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #DA291C;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .product-content {
+            padding: 2rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-content h3 {
+            color: #DA291C;
+            font-size: 1.6rem;
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+        }
+
+        .product-content p {
+            color: #666;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .product-footer {
+            display: block; /* Stack price and actions */
+            margin-top: auto;
+        }
+
+        .price {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #DA291C;
+            margin-bottom: 1rem;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .product-qty {
+            display: flex;
+            align-items: center;
+            border: 2px solid #e0e0e0;
+            border-radius: 30px;
+        }
+        
+        .qty-btn {
+            background: none;
+            border: none;
+            color: #DA291C;
+            font-size: 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0 12px;
+            height: 40px;
+        }
+        
+        .qty-input {
+            width: 40px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            background: none;
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+        }
+        
+        /* Hide arrows on number input */
+        .qty-input::-webkit-outer-spin-button,
+        .qty-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .qty-input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .add-btn {
+            background: #FFC72C;
+            color: #DA291C;
+            border: none;
+            padding: 0.8rem 1.8rem;
+            border-radius: 30px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-grow: 1; /* Button fills remaining space */
+            height: 44px; /* Match quantity selector height */
+        }
+
+        .add-btn:hover {
+            background: #DA291C;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Testimonials Section */
+        .testimonials {
+            padding: 6rem 8%;
+            background: #f9f9f9;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .testimonial-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        .stars {
+            color: #FFC72C;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-text {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #DA291C, #FFC72C);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .author-info h4 {
+            color: #DA291C;
+            font-weight: 600;
+        }
+
+        .author-info p {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        /* Locations Section */
+        .locations {
+            padding: 6rem 8%;
+            background: white;
+        }
+        
+        .locations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .location-card {
+            background: white;
+            border: 3px solid #f0f0f0;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .location-card:hover {
+            border-color: #FFC72C;
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(218, 41, 28, 0.1);
+        }
+
+        .location-card.coming-soon {
+            opacity: 0.7;
+        }
+
+        .location-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .location-card h3 {
+            color: #DA291C;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .location-status {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .status-open {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .status-coming {
+            background: #FFC72C;
+            color: #DA291C;
+        }
+
+        .location-card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .location-btn {
+            background: #DA291C;
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .location-btn:hover {
+            background: #ff4444;
+            transform: scale(1.05);
+        }
+
+        .location-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Gallery Section */
+        .gallery {
+            padding: 6rem 8%;
+            background: #f9f9f9;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .gallery-item {
+            height: 300px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(218, 41, 28, 0.2);
+        }
+
+        .gallery-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* --- Quick Order Section --- */
+        .quick-order-section {
+            padding: 6rem 8%;
+            background: #f9f9f9; /* Slightly different background */
+        }
+
+        .quick-order-container {
+            max-width: 900px; /* Wider for the grid */
+            margin: 3rem auto 0;
+            background: #fff;
+            padding: 3rem;
+            border-radius: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+
+        .quick-order-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .quick-order-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: #fdfdfd;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-order-item:hover {
+            border-color: #FFC72C;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .quick-item-img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .quick-item-info {
+            flex-grow: 1;
+        }
+
+        .quick-item-info h4 {
+            color: #DA291C;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .quick-item-price {
+            color: #555;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        /* Use the same .product-qty styles */
+        .quick-order-item .product-qty {
+            border: none;
+        }
+        .quick-order-item .qty-btn {
+            height: 35px;
+            padding: 0 10px;
+        }
+        .quick-order-item .qty-input {
+            width: 35px;
+            font-size: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            height: 35px;
+        }
+
+        .quick-order-divider {
+            border: 0;
+            height: 2px;
+            background: #f0f0f0;
+            margin: 2rem 0;
+        }
+
+        .customer-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Name and Phone side-by-side */
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .customer-details-grid .form-group {
+            margin-bottom: 0; /* Reset margin */
+        }
+        
+        .customer-details-grid .form-group:last-child {
+            grid-column: 1 / -1; 
+        }
+
+        /* Order Form Section (Custom) */
+        .order-form-section {
+            padding: 6rem 8%;
+            background: white;
+        }
+
+        .form-container {
+            max-width: 700px;
+            margin: 3rem auto 0;
+            background: #f9f9f9;
+            padding: 3rem;
+            border-radius: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #DA291C;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        /* Form group inside modal */
+        #checkout-form .form-group input,
+        #checkout-form .form-group select {
+            padding: 0.8rem 1rem;
+            font-size: 0.9rem;
+        }
+        #checkout-form .form-group label {
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+        #checkout-form .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #FFC72C;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .radio-group input[type="radio"] {
+            width: 1.2rem;
+            height: 1.2rem;
+            accent-color: #DA291C;
+        }
+
+        .radio-group label {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #DA291C, #ff4444);
+            color: white;
+            padding: 1.2rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+            width: 100%;
+            box-shadow: 0 6px 20px rgba(218, 41, 28, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(218, 41, 28, 0.4);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 8%;
+            background: white;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: #f9f9f9;
+            border-radius: 25px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            background: #FFC72C;
+            transform: translateY(-10px);
+        }
+
+        .feature-icon {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #DA291C, #ff4444);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 8px 25px rgba(218, 41, 28, 0.3);
+        }
+
+        .feature-card h3 {
+            color: #DA291C;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.7;
+        }
+
+       /* Payment Methods */
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(15px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes floaty {
+          0%   { transform: translateY(0); }
+          50%  { transform: translateY(-3px); }
+          100% { transform: translateY(0); }
+        }
+
+        .payment-methods {
+          background: linear-gradient(135deg, #ffffff, #f3f6fa);
+          border-radius: 24px;
+          padding: 40px 20px;
+          text-align: center;
+          width: 90%;
+          max-width: 800px;
+          margin: 50px auto;
+          box-shadow: 0 8px 20px rgba(0, 0, 50, 0.05);
+          transition: all 0.4s ease;
+          border: 2px solid #e3e6f0;
+          animation: fadeInUp 0.6s ease-out;
+        }
+
+        .payment-methods:hover {
+          background: linear-gradient(135deg, #ffffff, #f8fbff);
+          box-shadow: 0 10px 30px rgba(0, 0, 60, 0.1);
+          transform: translateY(-5px);
+        }
+
+        .payment-methods h3 {
+          font-size: 1.8rem;
+          color: #d32f2f; /* bakery red */
+          margin-bottom: 25px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          position: relative;
+        }
+
+        .payment-methods h3::after {
+          content: "";
+          display: block;
+          width: 60px;
+          height: 4px;
+          background: #1e3a8a; /* navy/blue */
+          margin: 8px auto 0;
+          border-radius: 2px;
+        }
+
+        .payment-icons {
+          display: flex;
+          justify-content: center;
+          flex-wrap: wrap;
+          gap: 20px;
+        }
+
+        .payment-icon {
+          background: white;
+          border-radius: 18px;
+          padding: 14px 25px;
+          font-size: 1.05rem;
+          font-weight: 600;
+          color: #1e293b;
+          box-shadow: 0 4px 10px rgba(30, 58, 138, 0.1);
+          border: 1px solid #e0e7ff;
+          transition: all 0.3s ease;
+          cursor: pointer;
+          transform: translateY(0);
+        }
+
+        .payment-icon:hover {
+          background: linear-gradient(135deg, #d32f2f, #1e3a8a);
+          color: #fff;
+          box-shadow: 0 8px 18px rgba(30, 58, 138, 0.25);
+          animation: floaty 0.8s ease-in-out infinite;
+          transform: scale(1.08);
+        }
+
+        /* CTA Section */
+        .cta {
+            background: linear-gradient(135deg, #DA291C 0%, #ff4444 100%);
+            padding: 6rem 8%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 199, 44, 0.1);
+            border-radius: 50%;
+            top: -150px;
+            left: -100px;
+        }
+
+        .cta::after {
+            content: '';
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            background: rgba(255, 199, 44, 0.1);
+            border-radius: 50%;
+            bottom: -150px;
+            right: -100px;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta h2 {
+            font-size: 3.5rem;
+            color: white;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+        }
+
+        .cta p {
+            font-size: 1.4rem;
+            color: rgba(255,255,255,0.95);
+            margin-bottom: 3rem;
+        }
+
+        .cta-btn {
+            background: #FFC72C;
+            color: #DA291C;
+            padding: 1.3rem 3.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 30px rgba(255, 199, 44, 0.3);
+        }
+
+        .cta-btn:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 15px 40px rgba(255, 199, 44, 0.4);
+        }
+
+        /* --- Shopping Cart Modal --- */
+        .cart-overlay {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+        }
+        
+        .cart-overlay.active {
+            display: block;
+        }
+
+        .cart-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 500px;
+            z-index: 2001;
+            /* Allow vertical scrolling */
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .cart-modal.active {
+            display: block;
+        }
+
+        .cart-modal h3 {
+            color: #DA291C;
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .cart-summary h4,
+        .cart-customer-details h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .cart-summary {
+            margin-bottom: 1.5rem;
+        }
+        
+        #cart-items-list {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        #cart-items-list li {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+            color: #555;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        #cart-items-list li span {
+            font-weight: 600;
+            color: #DA291C;
+        }
+        
+        #cart-items-list li.empty-cart {
+            justify-content: center;
+            font-style: italic;
+            color: #999;
+        }
+
+        .cart-total {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #DA291C;
+            text-align: right;
+            margin-top: 1rem;
+        }
+        
+        .cart-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .cart-btn-cancel,
+        .cart-btn-confirm {
+            padding: 1rem;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .cart-btn-cancel {
+            background: #f1f1f1;
+            color: #555;
+            border: 2px solid #ddd;
+        }
+        .cart-btn-cancel:hover {
+            background: #e0e0e0;
+        }
+        
+        .cart-btn-confirm {
+            background: linear-gradient(135deg, #DA291C, #ff4444);
+            color: white;
+            border: 2px solid transparent;
+        }
+        .cart-btn-confirm:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(218, 41, 28, 0.3);
+        }
+
+        /* Footer */
+        footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 4rem 8% 2rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-about h3 {
+            color: #FFC72C;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .footer-about p {
+            color: #aaa;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-link {
+            width: 45px;
+            height: 45px;
+            background: #DA291C;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .social-link:hover {
+            background: #FFC72C;
+            transform: scale(1.1);
+        }
+
+        .footer-section h4 {
+            color: #FFC72C;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-section a {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: #FFC72C;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #333;
+            padding-top: 2rem;
+            text-align: center;
+            color: #888;
+        }
+
+        @media (max-width: 1024px) {
+            .nav-links {
+                display: none; /* Hide desktop links */
+            }
+            .order-btn {
+                display: none; /* Hide desktop order button */
+            }
+            .hamburger-menu {
+                display: block; /* Show hamburger */
+            }
+
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .locations-container {
+                grid-template-columns: 1fr; /* Stack map */
+            }
+            .logo {
+        font-size: 1.5rem; /* Shrink text */
+        gap: 0.5rem;     /* Reduce gap */
+    }
+    .logo-img {
+        width: 40px;     /* Shrink image */
+        height: 40px;
+        border-radius: 10px;
+    }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem 5%;
+            }
+
+            .hero {
+                margin-top: 70px;
+                padding: 4rem 5%;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .quick-actions {
+                padding: 2rem 5%;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 3rem 5%;
+            }
+
+            .products, .features, .cta, .testimonials, .locations, .gallery, .order-form-section, .quick-order-section {
+                padding: 4rem 5%;
+            }
+            
+            .quick-order-container {
+                padding: 2rem;
+            }
+
+            .quick-order-grid {
+                grid-template-columns: 1fr; /* Stack items */
+            }
+
+            .customer-details-grid {
+                grid-template-columns: 1fr; /* Stack form fields */
+            }
+            
+            .section-header h2, .cta h2 {
+                font-size: 2.5rem;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-container {
+                padding: 2rem;
+                .logo span {
+        display: none;
+    }
+    /* --- END OF NEW RULE --- */
+
+    .hero {
+        margin-top: 70px;
+        }
+    </style>
+</head>
+<body>
+    <nav id="navbar">
+        <a href="#home" class="logo">
+            <img src="images/logo.png" alt="Hometown Bakery Logo" class="logo-img">
+            <span>Hometown Bakery</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#special">Today's Special</a></li>
+            <li><a href="#menu">Popular Items</a></li>
+            <li><a href="#quick-order">Quick Order</a></li>
+            <li><a href="#locations">Locations</a></li>
+            <li><a href="#order">Custom Orders</a></li>
+        </ul>
+        <div class="nav-actions">
+            <button class="cart-icon-btn" onclick="showCartModal()">
+                🛒
+                <span id="cart-item-count">0</span>
+            </button>
+            <button class="order-btn" onclick="scrollToSection('quick-order')">Order Now</button>
+            <div class="hamburger-menu" id="hamburger-btn">☰</div>
+        </div>
+    </nav>
+    
+    <div class="nav-overlay" id="nav-overlay" onclick="closeMobileMenu()"></div>
+    <div class="mobile-nav-menu" id="mobile-nav">
+        <div class="mobile-nav-header">
+            <a href="#home" class="logo" onclick="closeMobileMenu()">
+                <img src="images/logo.png" alt="Hometown Bakery Logo" class="logo-img">
+                <span>Hometown</span>
+            </a>
+            <div class="mobile-nav-close" onclick="closeMobileMenu()">×</div>
+        </div>
+        <ul>
+            <li><a href="#home" onclick="closeMobileMenu()">Home</a></li>
+            <li><a href="#special" onclick="closeMobileMenu()">Today's Special</a></li>
+            <li><a href="#menu" onclick="closeMobileMenu()">Popular Items</a></li>
+            <li><a href="#quick-order" onclick="closeMobileMenu()">Quick Order</a></li>
+            <li><a href="#locations" onclick="closeMobileMenu()">Locations</a></li>
+            <li><a href="#order" onclick="closeMobileMenu()">Custom Orders</a></li>
+            <li><a href="#" class="mobile-cart-btn" onclick="showCartModal()">View Cart 🛒</a></li>
+        </ul>
+    </div>
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <div class="hero-badge">✨ Freshly Baked Since 2019</div>
+            <h1>Delicious Baked Goods Daily</h1>
+            <p>Experience the true taste of home. Each product is made with quality ingredients and baked fresh every morning to give you the softness you love.</p>
+            <div class="hero-buttons">
+                <button class="primary-btn" onclick="scrollToSection('menu')">View Menu</button>
+                <button class="secondary-btn" onclick="scrollToSection('locations')">Find Us</button>
+            </div>
+        </div>
+        
+        <div class="hero-image-slider">
+            <img src="images/hometown 1.png" alt="Hometown Bakery Assortment" class="hero-slide">
+            <img src="images/wdding.jpg" alt="Beautiful Wedding Cake" class="hero-slide">
+            <img src="images/Hometown Bakery Fresh White Bread.png" alt="Fresh White Bread" class="hero-slide">
+            <img src="images/ChatGPT Image Nov 8, 2025, 06_46_51 PM.png" alt="Friendly Bakery Staff" class="hero-slide">
+        </div>
+    </section>
+
+    <section class="quick-actions">
+        <a href="tel:+255713333583" class="action-btn">
+            <span class="action-icon">📞</span>
+            Call Us Now
+        </a>
+        <a href="https://wa.me/qr/FHJO5AMZBICXL1" class="action-btn" target="_blank">
+            <span class="action-icon">💬</span>
+            WhatsApp Order
+        </a>
+        <a href="#order" class="action-btn">
+            <span class="action-icon">🎂</span>
+            Custom Cakes
+        </a>
+    </section>
+
+    <section class="special-offer" id="special">
+        <div class="special-offer-container">
+            <div class="special-image">
+                <img src="images/vitenesi.png" alt="Special of the Day" id="special-image">
+            </div>
+            <div class="special-content">
+                <span class="section-badge">🔥 Special of the Day</span>
+                
+                <h2 id="special-name">Loading...</h2>
+                
+                <p class="special-description" id="special-description">
+                    Checking for today's delicious offer...
+                </p>
+                
+                <div class="special-price">
+                    <span class="new-price" id="special-new-price"></span>
+                    <span class="old-price" id="special-old-price"></span>
+                </div>
+                <button class="primary-btn" onclick="addSpecialToCart()">
+                    Add to Cart
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="stat-item">
+            <div class="stat-number">7+</div>
+            <div class="stat-label">Years Experience</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">150+</div>
+            <div class="stat-label">Products</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">10,000+</div>
+            <div class="stat-label">Happy Customers</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">100%</div>
+            <div class="stat-label">Fresh Daily</div>
+        </div>
+    </section>
+
+    <section class="products" id="menu">
+        <div class="section-header">
+            <div class="section-badge">🍰 Our Menu</div>
+            <h2>Popular Items</h2>
+            <p>Hand-picked favorites loved by our customers. Add them to your cart!</p>
+        </div>
+        <div class="products-grid">
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="images/white bread 22.png" alt="White Bread" class="product-img">
+                    <div class="product-badge">Bestseller</div>
+                </div>
+                <div class="product-content">
+                    <h3>White Bread</h3>
+                    <p>Soft, fluffy premium white bread. Perfect for sandwiches and toast.</p>
+                    <div class="product-footer">
+                        <div class="price">TSh 1,800</div>
+                        <div class="product-actions">
+                            <div class="product-qty">
+                                <button type="button" class="qty-btn" onclick="updateQty('qty-p1', -1, 1)">-</button>
+                                <input type="number" id="qty-p1" class="qty-input" value="1" min="1" readonly>
+                                <button type="button" class="qty-btn" onclick="updateQty('qty-p1', 1, 1)">+</button>
+                            </div>
+                            <button class="add-btn" onclick="addToCart('white-bread', 'White Bread', 1800, 'qty-p1')">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="images/potato bread.png" alt="Potato Bread" class="product-img">
+                    <div class="product-badge">Healthy</div>
+                </div>
+                <div class="product-content">
+                    <h3>Potato Bread</h3>
+                    <p>Unique soft bread made with real potatoes. A customer favorite!</p>
+                    <div class="product-footer">
+                        <div class="price">TSh 2,500</div>
+                         <div class="product-actions">
+                            <div class="product-qty">
+                                <button type="button" class="qty-btn" onclick="updateQty('qty-p2', -1, 1)">-</button>
+                                <input type="number" id="qty-p2" class="qty-input" value="1" min="1" readonly>
+                                <button type="button" class="qty-btn" onclick="updateQty('qty-p2', 1, 1)">+</button>
+                            </div>
+                            <button class="add-btn" onclick="addToCart('potato-bread', 'Potato Bread', 2500, 'qty-p2')">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="images/scons..png" alt="Small Bread" class="product-img">
+                </div>
+                <div class="product-content">
+                    <h3>Small Bread</h3>
+                    <p>Unique soft bread made with real potatoes. A customer favorite!</p>
+                    <div class="product-footer">
+                        <div class="price">TSh 900</div>
+                         <div class="product-actions">
+                            <div class="product-qty">
+                                <button type="button" class="qty-btn" onclick="updateQty('qty-p3', -1, 1)">-</button>
+                                <input type="number" id="qty-p3" class="qty-input" value="1" min="1" readonly>
+                                <button type="button" class="qty-btn" onclick="updateQty('qty-p3', 1, 1)">+</button>
+                            </div>
+                            <button class="add-btn" onclick="addToCart('small-bread', 'Small Bread', 900, 'qty-p3')">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="images/milk  bread.png" alt="Milk Bread" class="product-img">
+                </div>
+                <div class="product-content">
+                    <h3>Milk Bread</h3>
+                    <p>Unique soft bread made with Milk. A family favorite!</p>
+                    <div class="product-footer">
+                        <div class="price">TSh 2,800</div>
+                         <div class="product-actions">
+                            <div class="product-qty">
+                                <button type="button" class="qty-btn" onclick="updateQty('qty-p4', -1, 1)">-</button>
+                                <input type="number" id="qty-p4" class="qty-input" value="1" min="1" readonly>
+                                <button type="button" class="qty-btn" onclick="updateQty('qty-p4', 1, 1)">+</button>
+                            </div>
+                            <button class="add-btn" onclick="addToCart('milk-bread', 'Milk Bread', 2800, 'qty-p4')">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="images/vitenesi.png" alt="Scons" class="product-img">
+                    <div class="product-badge">Popular</div>
+                </div>
+                <div class="product-content">
+                    <h3>Scons</h3>
+                    <p>Breads for family.</p>
+                    <div class="product-footer">
+                        <div class="price">TSh 2,500</div>
+                         <div class="product-actions">
+                            <div class="product-qty">
+                                <button type="button" class="qty-btn" onclick="updateQty('qty-p5', -1, 1)">-</button>
+                                <input type="number" id="qty-p5" class="qty-input" value="1" min="1" readonly>
+                                <button type="button" class="qty-btn" onclick="updateQty('qty-p5', 1, 1)">+</button>
+                            </div>
+                            <button class="add-btn" onclick="addToCart('scons', 'Scons', 2500, 'qty-p5')">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="images/maandazi.png" alt="Maandazi" class="product-img">
+                    <div class="product-badge">Popular</div>
+                </div>
+                <div class="product-content">
+                    <h3>Maandazi (Pack of 5)</h3>
+                    <p>Delicious Maandazi for family in a pack of 5.</p>
+                    <div class="product-footer">
+                        <div class="price">TSh 2,000</div>
+                         <div class="product-actions">
+                            <div class="product-qty">
+                                <button type="button" class="qty-btn" onclick="updateQty('qty-p6', -1, 1)">-</button>
+                                <input type="number" id="qty-p6" class="qty-input" value="1" min="1" readonly>
+                                <button type="button" class="qty-btn" onclick="updateQty('qty-p6', 1, 1)">+</button>
+                            </div>
+                            <button class="add-btn" onclick="addToCart('maandazi', 'Maandazi (Pack of 5)', 2000, 'qty-p6')">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="images/cup cake.webp" alt="Cup Cake" class="product-img">
+                    <div class="product-badge">Popular</div>
+                </div>
+                <div class="product-content">
+                    <h3>Cup Cake</h3>
+                    <p>Cupcake for all occasions.</p>
+                    <div class="product-footer">
+                        <div class="price">TSh 15,800</div>
+                         <div class="product-actions">
+                            <div class="product-qty">
+                                <button type="button" class="qty-btn" onclick="updateQty('qty-p7', -1, 1)">-</button>
+                                <input type="number" id="qty-p7" class="qty-input" value="1" min="1" readonly>
+                                <button type="button" class="qty-btn" onclick="updateQty('qty-p7', 1, 1)">+</button>
+                            </div>
+                            <button class="add-btn" onclick="addToCart('cup-cake', 'Cup Cake', 15800, 'qty-p7')">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="images/wdding.jpg" alt="Custom Cake" class="product-img">
+                </div>
+                <div class="product-content">
+                    <h3>Wedding Cake</h3>
+                    <p>Personalized cakes for weddings. Order in advance via our custom form.</p>
+                    <div class="product-footer" style="display: block;">
+                        <div class="price">TSh 90,000+</div>
+                        <div class="product-actions">
+                            <button class="add-btn" onclick="scrollToSection('order')" style="width: 100%;">Customize</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials" id="testimonials">
+        <div class="section-header">
+            <div class="section-badge">⭐ Testimonials</div>
+            <h2>What Our Customers Say</h2>
+            <p>Real reviews from real customers</p>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p class="testimonial-text">"The best bakery in town! Their white bread is absolutely divine. I come here every morning for breakfast. Highly recommended!"</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">A</div>
+                    <div class="author-info">
+                        <h4>Amina Hassan</h4>
+                        <p>Regular Customer</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p class="testimonial-text">"Ordered a custom birthday cake and it exceeded all expectations! Beautiful design and tasted amazing. Everyone loved it!"</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">J</div>
+                    <div class="author-info">
+                        <h4>John Mwamba</h4>
+                        <p>Event Customer</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="stars">⭐⭐⭐⭐⭐</div>
+                <p class="testimonial-text">"Fresh bread daily, friendly staff, and reasonable prices. This is my go-to place for all baked goods. Love the muffins!"</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">S</div>
+                    <div class="author-info">
+                        <h4>Sarah Kimaro</h4>
+                        <p>Loyal Customer</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="locations" id="locations">
+        <div class="section-header">
+            <div class="section-badge">📍 Our Locations</div>
+            <h2>Visit Us</h2>
+            <p>Find a Hometown Bakery near you</p>
+        </div>
+        
+        <div class="locations-grid">
+            <div class="location-card">
+                <div class="location-icon">🏪</div>
+                <h3>Iringa</h3>
+                <span class="location-status status-open">NOW OPEN</span>
+                <p>📍 Uhuru Street, Iringa<br>
+                📞 +255 713333583<br>
+                ⏰ Mon-Sat: 6am - 8pm<br>
+                ⏰ Sunday: 7am - 6pm</p>
+                <button class="location-btn" onclick="getDirections('Iringa')">Get Directions</button>
+            </div>
+            <div class="location-card coming-soon">
+                <div class="location-icon">🏗️</div>
+                <h3>Mbeya</h3>
+                <span class="location-status status-coming">COMING SOON</span>
+                <p>📍 Mbeya City Center<br>
+                📅 Opening: December 2025<br>
+                🎉 Grand Opening Specials<br>
+                📧 Get notified when we open</p>
+                <button class="location-btn" disabled>Opening Soon</button>
+            </div>
+            <div class="location-card coming-soon">
+                <div class="location-icon">🏗️</div>
+                <h3>Dodoma</h3>
+                <span class="location-status status-coming">COMING SOON</span>
+                <p>📍 Dodoma Capital City<br>
+                📅 Opening: January 2026<br>
+                🎉 Pre-opening discounts<br>
+                📧 Subscribe for updates</p>
+                <button class="location-btn" disabled>Opening Soon</button>
+            </div>
+            <div class="location-card coming-soon">
+                <div class="location-icon">🏗️</div>
+                <h3>Dar es Salaam</h3>
+                <span class="location-status status-coming">COMING SOON</span>
+                <p>📍 Masaki Peninsula, DSM<br>
+                📅 Opening: March 2026<br>
+                🎉 Special launch offers<br>
+                📧 Join the waitlist</p>
+                <button class="location-btn" disabled>Opening Soon</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="gallery">
+        <div class="section-header">
+            <div class="section-badge">📸 Gallery</div>
+            <h2>Our Creations</h2>
+            <p>A glimpse of what we bake daily</p>
+        </div>
+        <div class="gallery-grid">
+            <div class="gallery-item">
+                <img src="images/hometown 1.png"alt="Bread Display" class="gallery-img img-placeholder">
+            </div>
+            <div class="gallery-item">
+                <img src="images/ChatGPT Image Nov 8, 2025, 06_46_51 PM.png" alt="Bakery Staff" class="gallery-img img-placeholder">
+            </div>
+            <div class="gallery-item">
+                <img src="images/ChatGPT Image Nov 8, 2025, 06_57_59 PM.png" alt="Our Team" class="gallery-img img-placeholder">
+            </div>
+        
+            <div class="gallery-item">
+                <img src="images/Hometown Bakery Fresh White Bread.png" alt="Muffins" class="gallery-img img-placeholder">
+            </div>
+            <div class="gallery-item">
+                <img src="images/maandazi.png" alt="Bread Varieties" class="gallery-img img-placeholder">
+            </div>
+        </div>
+    </section>
+
+    <section class="quick-order-section" id="quick-order">
+        <div class="section-header">
+            <div class="section-badge">🚀 Quick Order</div>
+            <h2>Order Your Favorites Now</h2>
+            <p>Select your items, and we'll call you to confirm your order and payment.</p>
+        </div>
+        
+        <div class="quick-order-container">
+            <form id="quickOrderForm" onsubmit="submitQuickOrderForm(event)">
+                <div class="quick-order-grid">
+                    
+                    <div class="quick-order-item">
+                        <img src="images/white bread 22.png" alt="White Bread" class="quick-item-img">
+                        <div class="quick-item-info">
+                            <h4>White Bread</h4>
+                            <span class="quick-item-price">TSh 1,800</span>
+                        </div>
+                        <div class="product-qty">
+                            <button type="button" class="qty-btn" onclick="updateQty('qty-white-bread', -1, 0)">-</button>
+                            <input type="number" id="qty-white-bread" name="qty_white_bread" class="qty-input" value="0" min="0" readonly>
+                            <button type="button" class="qty-btn" onclick="updateQty('qty-white-bread', 1, 0)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="quick-order-item">
+                        <img src="images/potato bread.png" alt="Potato Bread" class="quick-item-img">
+                        <div class="quick-item-info">
+                            <h4>Potato Bread</h4>
+                            <span class="quick-item-price">TSh 2,500</span>
+                        </div>
+                        <div class="product-qty">
+                            <button type="button" class="qty-btn" onclick="updateQty('qty-potato-bread', -1, 0)">-</button>
+                            <input type="number" id="qty-potato-bread" name="qty_potato_bread" class="qty-input" value="0" min="0" readonly>
+                            <button type="button" class="qty-btn" onclick="updateQty('qty-potato-bread', 1, 0)">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-order-item">
+                        <img src="images/maandazi.png" alt="Maandazi" class="quick-item-img">
+                        <div class="quick-item-info">
+                            <h4>Maandazi (Pack of 5)</h4>
+                            <span class="quick-item-price">TSh 2,000</span>
+                        </div>
+                        <div class="product-qty">
+                            <button type="button" class="qty-btn" onclick="updateQty('qty-maandazi', -1, 0)">-</button>
+                            <input type="number" id="qty-maandazi" name="qty_maandazi" class="qty-input" value="0" min="0" readonly>
+                            <button type="button" class="qty-btn" onclick="updateQty('qty-maandazi', 1, 0)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="quick-order-item">
+                        <img src="images/milk   bread.png" alt="Milk Bread" class="quick-item-img">
+                        <div class="quick-item-info">
+                            <h4>Milk Bread</h4>
+                            <span class="quick-item-price">TSh 2,800</span>
+                        </div>
+                        <div class="product-qty">
+                            <button type="button" class="qty-btn" onclick="updateQty('qty-milk-bread', -1, 0)">-</button>
+                            <input type="number" id="qty-milk-bread" name="qty_milk_bread" class="qty-input" value="0" min="0" readonly>
+                            <button type="button" class="qty-btn" onclick="updateQty('qty-milk-bread', 1, 0)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="quick-order-item">
+                        <img src="images/vitenesi.png" alt="Scons" class="quick-item-img">
+                        <div class="quick-item-info">
+                            <h4>Scons</h4>
+                            <span class="quick-item-price">TSh 2,500</span>
+                        </div>
+                        <div class="product-qty">
+                            <button type="button" class="qty-btn" onclick="updateQty('qty-scons', -1, 0)">-</button>
+                            <input type="number" id="qty-scons" name="qty_scons" class="qty-input" value="0" min="0" readonly>
+                            <button type="button" class="qty-btn" onclick="updateQty('qty-scons', 1, 0)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="quick-order-item">
+                        <img src="images/cup cake.webp" alt="Cup Cake" class="quick-item-img">
+                        <div class="quick-item-info">
+                            <h4>Cup Cake</h4>
+                            <span class="quick-item-price">TSh 15,800</span>
+                        </div>
+                        <div class="product-qty">
+                            <button type="button" class="qty-btn" onclick="updateQty('qty-cupcake', -1, 0)">-</button>
+                            <input type="number" id="qty-cupcake" name="qty_cupcake" class="qty-input" value="0" min="0" readonly>
+                            <button type="button" class="qty-btn" onclick="updateQty('qty-cupcake', 1, 0)">+</button>
+                        </div>
+                    </div>
+
+                </div> <hr class="quick-order-divider">
+
+                <div class="customer-details-grid">
+                    <div class="form-group">
+                        <label>Your Name *</label>
+                        <input type="text" name="name" required placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number *</label>
+                        <input type="tel" name="phone" required placeholder="+255 xxx xxx xxx">
+                    </div>
+                    <div class="form-group">
+                        <label>Pickup or Delivery? *</label>
+                        <div class="radio-group">
+                            <input type="radio" id="quick-pickup" name="service_type" value="Pickup" checked>
+                            <label for="quick-pickup">Pickup</label>
+                            <input type="radio" id="quick-delivery" name="service_type" value="Delivery">
+                            <label for="quick-delivery">Delivery (Iringa Town)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Place Quick Order</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="order-form-section" id="order">
+        <div class="section-header">
+            <div class="section-badge">🎂 Custom Orders</div>
+            <h2>Place Your Custom Order</h2>
+            <p>For custom cakes and large events. We'll get back to you within 24 hours</p>
+        </div>
+        <div class="form-container">
+            <form id="customOrderForm" onsubmit="submitCustomOrder(event)">
+                <div class="form-group">
+                    <label>Your Name *</label>
+                    <input type="text" name="name" required placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number *</label>
+                    <input type="tel" name="phone" required placeholder="+255 xxx xxx xxx">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Product Type *</label>
+                    <select name="product" required>
+                        <option value="">Select a product</option>
+                        <option value="cake">Custom Cake</option>
+                        <option value="cupcakes">Cupcakes (bulk)</option>
+                        <option value="cookies">Cookies (bulk)</option>
+                        <option value="bread">Bread (bulk)</option>
+                        <option value="other">Other Event</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Pickup Date *</label>
+                    <input type="date" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label>Special Instructions</label>
+                    <textarea name="instructions" placeholder="Tell us about colors, flavors, decorations, dietary requirements, etc."></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Submit Order Request</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="section-header">
+            <div class="section-badge">⭐ Why Choose Us</div>
+            <h2>What Makes Us Special</h2>
+            <p>Quality ingredients, expert bakers, and passion in every bite</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🌾</div>
+                <h3>Premium Ingredients</h3>
+                <p>We source only the finest, locally-sourced ingredients to ensure exceptional quality and taste.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👨‍🍳</div>
+                <h3>Master Bakers</h3>
+                <p>Our team of skilled artisans brings decades of baking expertise to every creation.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⏰</div>
+                <h3>Fresh Daily</h3>
+                <p>Everything is baked fresh each morning. We never compromise on freshness.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="payment-methods">
+        <h3>We Accept</h3>
+        <div class="payment-icons">
+            <div class="payment-icon">💵 Cash</div>
+            <div class="payment-icon">💳 Card</div>
+            <div class="payment-icon">📱 M-Pesa</div>
+            <div class="payment-icon">📱 Tigo Pesa</div>
+            <div class="payment-icon">📱 Airtel Money</div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="cta-content">
+            <h2>Visit Us Today!</h2>
+            <p>Stop by and experience the aroma of fresh-baked goodness</p>
+            <button class="cta-btn" onclick="scrollToSection('locations')">Find Our Locations</button>
+        </div>
+    </section>
+
+    <div class="cart-overlay" id="cart-overlay" onclick="closeCartModal()"></div>
+    <div class="cart-modal" id="cart-modal">
+        <h3>Your Order</h3>
+        
+        <div class="cart-summary">
+            <h4>Your Items:</h4>
+            <ul id="cart-items-list">
+                </ul>
+            <hr>
+            <div class="cart-total" id="cart-total-price">
+                Total: TSh 0
+            </div>
+        </div>
+
+        <form id="checkout-form" onsubmit="event.preventDefault(); submitCartOrder();">
+            <div class="cart-customer-details">
+                <h4>Your Details:</h4>
+                <div class="form-group">
+                    <label for="checkout-name">Your Name *</label>
+                    <input type="text" id="checkout-name" name="name" required placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="checkout-phone">Phone Number *</label>
+                    <input type="tel" id="checkout-phone" name="phone" required placeholder="+255 xxx xxx xxx">
+                </div>
+                <div class="form-group">
+                    <label>Pickup or Delivery? *</label>
+                    <div class="radio-group">
+                        <input type="radio" id="pickup" name="service_type" value="Pickup" checked>
+                        <label for="pickup">Pickup</label>
+                        <input type="radio" id="delivery" name="service_type" value="Delivery">
+                        <label for="delivery">Delivery (Iringa Town)</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cart-buttons">
+                <button type="button" class="cart-btn-cancel" onclick="closeCartModal()">Cancel</button>
+                <button type="submit" class="cart-btn-confirm">Confirm Order</button>
+            </div>
+        </form>
+    </div>
+
+
+    <footer id="contact">
+        <div class="footer-grid">
+            <div class="footer-about">
+                <h3>🥐 Hometown Bakery</h3>
+                <p>Serving our community with love and the finest baked goods for over 7 years. Every item is made with passion and dedication to quality.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">f</a>
+                    <a href="#" class="social-link">📷</a>
+                    <a href="#" class="social-link">🐦</a>
+                    <a href="#" class="social-link">📱</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#special">Today's Special</a></li>
+                    <li><a href="#menu">Popular Items</a></li>
+                    <li><a href="#quick-order">Quick Order</a></li>
+                    <li><a href="#locations">Locations</a></li>
+                    <li><a href="#order">Custom Orders</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Opening Hours</h4>
+                <ul>
+                    <li>Mon-Fri: 6am - 8pm</li>
+                    <li>Saturday: 7am - 8pm</li>
+                    <li>Sunday: 7am - 6pm</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact Us</h4>
+                <ul>
+                    <li>📞 +255713333583</li>
+                    <li>📧 info@hometownbakery.co.tz</li>
+                    <li>📍 Iringa, Tanzania</li>
+                    <li>💬 WhatsApp Orders</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Hometown Bakery. All rights reserved. Made with ❤️ in Tanzania</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- Global Cart ---
+        let cart = {};
+        
+        // --- Global variable for today's special ---
+        let todaySpecial = {};
+
+        // --- Price list for our items (for cart total) ---
+        // We will update this list with the special price when it loads
+        const itemPrices = {
+            'white-bread': 1800,
+            'potato-bread': 2500,
+            'small-bread': 900,
+            'milk-bread': 2800,
+            'scons': 2500,
+            'maandazi': 2000,
+            'cup-cake': 15800
+        };
+
+        // --- DAILY SPECIALS LOGIC ---
+        const weeklySpecials = [
+            { id: 'maandazi', name: "Maandazi (Pack of 5)", description: "Start your Sunday with our family pack of 5 delicious, fluffy maandazi. Perfect for sharing.", newPrice: "TSh 1,800", oldPrice: "TSh 2,000", imageSrc: "images/maandazi.png", price: 1800 },
+            { id: 'white-bread', name: "White Bread", description: "It's Monday! Get our fresh, soft White Bread, perfect for school lunches and breakfast toast.", newPrice: "TSh 1,600", oldPrice: "TSh 1,800", imageSrc: "images/white bread 22.png", price: 1600 },
+            { id: 'potato-bread', name: "Potato Bread", description: "Try our unique and incredibly soft Potato Bread. A customer favorite for a reason!", newPrice: "TSh 2,200", oldPrice: "TSh 2,500", imageSrc: "images/potato bread.png", price: 2200 },
+            { id: 'scons', name: "Scons (Vitenesi)", description: "Get over the hump of the week with our fresh Scons. Perfect with your afternoon tea.", newPrice: "TSh 2,500", oldPrice: "TSh 3,000", imageSrc: "images/vitenesi.png", price: 2500 },
+            { id: 'milk-bread', name: "Milk Bread", description: "A family favorite! Our rich and soft Milk Bread is on special today. Great for all ages.", newPrice: "TSh 2,500", oldPrice: "TSh 2,800", imageSrc: "images/milk   bread.png", price: 2500 },
+            { id: 'cup-cake', name: "Cup Cake", description: "Celebrate Friday! Treat yourself with our delicious Cup Cakes.", newPrice: "TSh 15,800", oldPrice: "TSh 18,000", imageSrc: "images/cup cake.webp", price: 15800 },
+            { id: 'small-bread', name: "Small Bread", description: "Perfect for the weekend! Grab our popular Small Bread, ideal for quick sandwiches or snacks.", newPrice: "TSh 800", oldPrice: "TSh 900", imageSrc: "images/scons..png", price: 800 }
+        ];
+
+        function loadDailySpecial() {
+            const dayOfWeek = new Date().getDay();
+            todaySpecial = weeklySpecials[dayOfWeek];
+            
+            document.getElementById('special-image').src = todaySpecial.imageSrc;
+            document.getElementById('special-name').textContent = todaySpecial.name;
+            document.getElementById('special-description').textContent = todaySpecial.description;
+            document.getElementById('special-new-price').textContent = todaySpecial.newPrice;
+            document.getElementById('special-old-price').textContent = todaySpecial.oldPrice;
+            
+            // Also update the main item price list for the special day
+            itemPrices[todaySpecial.id] = todaySpecial.price;
+        }
+
+        // --- HERO SLIDER LOGIC ---
+        function initHeroSlider() {
+            const slides = document.querySelectorAll('.hero-slide');
+            if (!slides || slides.length === 0) return;
+            let currentSlide = 0;
+            slides[currentSlide].classList.add('active');
+            setInterval(() => {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length; 
+                slides[currentSlide].classList.add('active');
+            }, 3000);
+        }
+
+        // --- MOBILE NAV LOGIC ---
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const mobileNav = document.getElementById('mobile-nav');
+        const navOverlay = document.getElementById('nav-overlay');
+
+        hamburgerBtn.addEventListener('click', () => {
+            mobileNav.classList.add('active');
+            navOverlay.classList.add('active');
+        });
+
+        function closeMobileMenu() {
+            mobileNav.classList.remove('active');
+            navOverlay.classList.remove('active');
+        }
+
+        // --- RUN ALL STARTUP SCRIPTS ONCE DOM IS LOADED ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDailySpecial(); 
+            initHeroSlider();
+            updateCartCount();
+
+            // Set min date for custom order form
+            const dateInput = document.querySelector('#customOrderForm input[type="date"]');
+            if (dateInput) {
+                const today = new Date();
+                today.setDate(today.getDate() + 2); // At least 2 days notice
+                dateInput.min = today.toISOString().split('T')[0];
+            }
+        });
+
+
+        // --- GENERAL HELPER FUNCTIONS ---
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+        });
+
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        document.querySelectorAll('.product-card, .feature-card, .testimonial-card, .location-card, .special-offer-container, .quick-order-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(50px)';
+            el.style.transition = 'all 0.6s ease-out';
+            observer.observe(el);
+        });
+
+        function getDirections(location) {
+            alert(`Opening Google Maps for ${location} location...\n\nAddress: Uhuru Street, Iringa`);
+            // We will replace this with the real map logic in Step 2
+        }
+
+        
+        // --- NEW CART LOGIC ---
+        
+        function updateQty(inputId, amount, minVal = 1) {
+            const input = document.getElementById(inputId);
+            let qty = parseInt(input.value);
+            qty += amount;
+            if (qty < minVal) {
+                qty = minVal;
+            }
+            input.value = qty;
+        }
+
+        function addSpecialToCart() {
+            // Use the globally set todaySpecial object
+            // The special item has no quantity selector, so we just add 1
+            addToCart(todaySpecial.id, todaySpecial.name, todaySpecial.price, 1);
+        }
+
+        function addToCart(id, name, price, qtyOrInputId) {
+            let qty = 1; // Default
+            
+            // Check if we passed a quantity (from special) or an ID (from menu)
+            if (typeof qtyOrInputId === 'string') {
+                const input = document.getElementById(qtyOrInputId);
+                qty = parseInt(input.value);
+            } else {
+                qty = qtyOrInputId;
+            }
+            
+            // Use the price from the dynamic price list
+            const itemPrice = itemPrices[id] || price; 
+
+            if (cart[id]) {
+                // Item already in cart, add the new quantity
+                cart[id].qty += qty;
+            } else {
+                // Add new item to cart
+                cart[id] = {
+                    name: name,
+                    price: itemPrice,
+                    qty: qty
+                };
+            }
+            alert(`Added ${qty} x ${name} to cart!`);
+            updateCartCount();
+            
+            // Reset quantity input back to 1 if it's an input ID
+            if (typeof qtyOrInputId === 'string') {
+                document.getElementById(qtyOrInputId).value = 1;
+            }
+        }
+
+        function updateCartCount() {
+            let totalItems = 0;
+            for (const id in cart) {
+                totalItems += cart[id].qty;
+            }
+            document.getElementById('cart-item-count').textContent = totalItems;
+        }
+
+        function showCartModal() {
+            closeMobileMenu(); // Close mobile menu if it's open
+            
+            const itemListHtml = document.getElementById('cart-items-list');
+            const totalDisplay = document.getElementById('cart-total-price');
+            let html = '';
+            let totalPrice = 0;
+            
+            if (Object.keys(cart).length === 0) {
+                html = '<li class="empty-cart">Your cart is empty.</li>';
+                totalPrice = 0;
+            } else {
+                for (const id in cart) {
+                    const item = cart[id];
+                    const itemTotal = item.price * item.qty;
+                    html += `
+                        <li>
+                            ${item.name} (x${item.qty})
+                            <span>TSh ${itemTotal.toLocaleString()}</span>
+                        </li>
+                    `;
+                    totalPrice += itemTotal;
+                }
+            }
+
+            itemListHtml.innerHTML = html;
+            totalDisplay.textContent = `Total: TSh ${totalPrice.toLocaleString()}`;
+            
+            // Reset the form fields inside the modal
+            document.getElementById('checkout-form').reset();
+
+            // Show the Modal
+            document.getElementById('cart-overlay').classList.add('active');
+            document.getElementById('cart-modal').classList.add('active');
+        }
+
+        function closeCartModal() {
+            document.getElementById('cart-overlay').classList.remove('active');
+            document.getElementById('cart-modal').classList.remove('active');
+        }
+
+        
+        // --- NEW SUBMIT FUNCTIONS ---
+
+        // 1. For the GLOBAL CART (modal checkout)
+        async function submitCartOrder() {
+            const form = document.getElementById('checkout-form');
+            
+            // --- Form Validation ---
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const formData = new FormData(form);
+            const customerData = Object.fromEntries(formData);
+            
+            if (Object.keys(cart).length === 0) {
+                alert("Your cart is empty. Please add some items first.");
+                return;
+            }
+            
+            // Combine cart data and customer data
+            const orderData = {
+                ...customerData,
+                items: cart,
+                order_type: "Cart" // This tells the backend how to format the email
+            };
+
+            alert("Sending your order, please wait...");
+
+            try {
+                // Send the combined data to your backend server
+                const response = await fetch('http://hometownbakery.co.tz', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderData),
+                });
+
+                if (response.ok) {
+                    alert(`Thank you, ${customerData.name}! 🎉\n\nYour order has been sent. We will call you at ${customerData.phone} shortly to confirm.`);
+                    cart = {}; // Empty the cart
+                    updateCartCount();
+                    closeCartModal();
+                } else {
+                    alert("There was a problem sending your order. Please try calling us.");
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                alert("Could not connect to the server. Please check your internet and try again.");
+            }
+        }
+        
+        // 2. For the self-contained QUICK ORDER FORM
+        async function submitQuickOrderForm(event) {
+            event.preventDefault();
+            const form = event.target;
+            
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+
+            // Check if any item was selected
+            let hasItems = false;
+            let itemDetails = {};
+            for (const [key, qty] of Object.entries(data)) {
+                if (key.startsWith('qty_') && parseInt(qty) > 0) {
+                    hasItems = true;
+                    itemDetails[key] = qty; // Store the items
+                }
+            }
+
+            if (!hasItems) {
+                alert("Please select at least one item (quantity > 0) to order.");
+                return;
+            }
+            
+            // Build the final order data
+            const orderData = {
+                name: data.name,
+                phone: data.phone,
+                service_type: data.service_type,
+                items: itemDetails, // Send only the items
+                order_type: "QuickForm" // This tells the backend how to format
+            };
+
+            alert("Sending your order, please wait...");
+
+            try {
+                // Send the data to your new backend server
+                const response = await fetch('http://hometownbakery.co.tz', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(orderData),
+                });
+
+                if (response.ok) {
+                    alert(`Thank you, ${data.name}! 🎉\n\nYour order has been sent. We will call you at ${data.phone} shortly to confirm.`);
+                    form.reset();
+                } else {
+                    alert("There was a problem sending your order. Please try calling us.");
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                alert("Could not connect to the server. Please check your internet and try again.");
+            }
+        }
+
+        // 3. For the CUSTOM ORDER FORM
+        async function submitCustomOrder(event) {
+            event.preventDefault(); 
+            const form = event.target;
+            
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+
+            alert("Sending your custom order request, please wait...");
+            
+            try {
+                // !! REMEMBER TO CHANGE THIS URL WHEN YOU HOST YOUR BACKEND !!
+                const response = await fetch('http://hometownbakery.co.tz', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    alert(`Thank you, ${data.name}! 🎉\n\nYour custom order request is sent. We will contact you shortly to confirm.`);
+                    form.reset();
+                } else {
+                    alert("There was a problem sending your request. Please try calling us.");
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                alert("Could not connect to the server. Please check your internet and try again.");
+            }
+        }
+
+    </script>
+</body>
+</html>
